@@ -2,7 +2,11 @@
 {
     public PlayerIdleState(PlayerStateMachine ctx, PlayerStateFactory factory) : base(ctx, factory) { }
 
-    public override void EnterState() { _ctx.PlayAnimation("Idle"); }
+    public override void EnterState()
+    {
+        // Gọi thông qua Hash đã khai báo ở Controller
+        _ctx.PlayAnimation(_ctx.Anim_Idle, 0.1f);
+    }
     protected override void UpdateState() { _ctx.Velocity.x = 0; _ctx.Velocity.z = 0; CheckSwitchState(); }
     protected override void ExitState() { }
     public override void CheckSwitchState()

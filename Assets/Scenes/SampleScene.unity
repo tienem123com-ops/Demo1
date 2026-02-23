@@ -144,7 +144,7 @@ RectTransform:
   m_GameObject: {fileID: 11944748}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.47674, y: 0.47674, z: 0.47674}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1564573580}
@@ -153,7 +153,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 140}
+  m_AnchoredPosition: {x: 0, y: 110.7}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 1.06}
 --- !u!43 &16978882
@@ -853,7 +853,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.81, y: 3.0939999, z: -4.45}
+  m_LocalPosition: {x: -30.81, y: 3.464, z: -3.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1117,12 +1117,17 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 6e064e17c24647242b1b1445bddc58bb, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 9100000, guid: 204895ef3eab9334484e031a09c66e33, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e064e17c24647242b1b1445bddc58bb, type: 3}
+--- !u!95 &498139175 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 6e064e17c24647242b1b1445bddc58bb, type: 3}
+  m_PrefabInstance: {fileID: 498139174}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &644571248
 GameObject:
   m_ObjectHideFlags: 0
@@ -1133,7 +1138,7 @@ GameObject:
   m_Component:
   - component: {fileID: 644571252}
   - component: {fileID: 644571251}
-  - component: {fileID: 644571250}
+  - component: {fileID: 644571253}
   - component: {fileID: 644571249}
   m_Layer: 0
   m_Name: Third Person Aim Camera
@@ -1160,32 +1165,6 @@ MonoBehaviour:
   IgnoreTag: 
   AimDistance: 1
   NoiseCancellation: 1
---- !u!114 &644571250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 644571248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 625c14eee3ad46c99df7c7c891ef668a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonFollow
-  Damping: {x: 0, y: 3, z: 0}
-  ShoulderOffset: {x: 0, y: 0.08, z: -4.66}
-  VerticalArmLength: 0
-  CameraSide: 0
-  CameraDistance: 0
-  AvoidObstacles:
-    Enabled: 0
-    CollisionFilter:
-      serializedVersion: 2
-      m_Bits: 1
-    IgnoreTag: 
-    CameraRadius: 0.2
-    DampingIntoCollision: 0
-    DampingFromCollision: 0.5
 --- !u!114 &644571251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1238,12 +1217,38 @@ Transform:
   m_GameObject: {fileID: 644571248}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.81, y: 3.0939999, z: -4.45}
+  m_LocalPosition: {x: -30.81, y: 3.464, z: -3.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &644571253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644571248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 625c14eee3ad46c99df7c7c891ef668a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonFollow
+  Damping: {x: 0.1, y: 0.5, z: 0.3}
+  ShoulderOffset: {x: 0, y: 0.05, z: -1.88}
+  VerticalArmLength: 0.4
+  CameraSide: 1
+  CameraDistance: 2
+  AvoidObstacles:
+    Enabled: 0
+    CollisionFilter:
+      serializedVersion: 2
+      m_Bits: 1
+    IgnoreTag: 
+    CameraRadius: 0.2
+    DampingIntoCollision: 0
+    DampingFromCollision: 0.5
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2436,19 +2441,45 @@ MonoBehaviour:
   gravityScaling: 2.5
   fallClamp: -30
   dashForce: 35
-  dashDuration: 0.2
   dashCooldown: 1
+  dashLength: 0
+  dashDuration: 0.2
+  dashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  IsDashing: 0
   rotationSpeed: 15
   airControl: 5
   model: {fileID: 2124613167}
   mainCamera: {fileID: 0}
   gravity: 0
   initialJumpVelocity: 0
-  Velocity: {x: 0, y: 0, z: 0}
+  Velocity: {x: 1.55, y: 0, z: 0}
   InputVector: {x: 0, y: 0}
   CoyoteCounter: 0
   JumpBufferCounter: 0
-  animator: {fileID: 0}
+  animator: {fileID: 498139175}
 --- !u!1 &1870563764
 GameObject:
   m_ObjectHideFlags: 0

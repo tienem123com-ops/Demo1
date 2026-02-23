@@ -7,11 +7,8 @@ public class PlayerJumpingState : PlayerBaseState
 
     public override void EnterState()
     {
-        // 1. Thực hiện cú nhảy
-        HandleJump();
-
-        // 2. Chơi Animation Jump
-        _ctx.PlayAnimation("Jump", 0.05f);
+        _ctx.PlayAnimation(_ctx.Anim_Jump_Begin, 0.05f); // Transition rất ngắn để bật lên ngay
+        _ctx.Velocity.y = _ctx.initialJumpVelocity;
     }
 
     private void HandleJump()

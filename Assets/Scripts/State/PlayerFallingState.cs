@@ -7,11 +7,9 @@ public class PlayerFallingState : PlayerBaseState
 
     public override void EnterState()
     {
-        // Nếu chuyển từ Grounded (rơi tự do) thì play Fall, 
-        // nếu từ Jumping thì có thể để Jump animation chạy nốt hoặc blend sang Fall
-        _ctx.PlayAnimation("FallLoop", 0.2f);
+        // Nếu chuyển từ Jump sang Falling, dùng transition mượt để thấy tư thế rơi
+        _ctx.PlayAnimation(_ctx.Anim_Falling, 0.15f);
     }
-
     protected override void UpdateState()
     {
         Vector3 moveDir = _ctx.GetLookDirection();

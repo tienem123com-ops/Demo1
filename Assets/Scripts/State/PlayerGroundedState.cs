@@ -5,7 +5,16 @@ public class PlayerGroundedState : PlayerBaseState
     public PlayerGroundedState(PlayerStateMachine ctx, PlayerStateFactory factory)
         : base(ctx, factory) { IsRootState = true; }
 
-    public override void EnterState() { InitializeSubState(); }
+    // Trong PlayerGroundedState.cs hoặc logic kiểm tra IsGrounded
+    public override void EnterState()
+    {
+        // Nếu vận tốc rơi trước đó đủ lớn (vừa rơi xuống)
+        if (_ctx.Velocity.y < -5.0f)
+        {
+            _ctx.PlayAnimation(_ctx.Anim_Land, 0.1f);
+        }
+        InitializeSubState();
+    }
     protected override void UpdateState() { CheckSwitchState(); }
     protected override void ExitState() { }
 

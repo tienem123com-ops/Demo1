@@ -16,9 +16,12 @@ public class PlayerStateMachine : MonoBehaviour
 
     [Header("Dash Settings")]
     public float dashForce = 35f;
-    public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
     private float _dashCooldownTimer;
+    public float dashLength = 7.0f;    // Quãng đường lướt (mét)
+    public float dashDuration = 0.25f; // Thời gian lướt (giây)
+    public AnimationCurve dashCurve = AnimationCurve.Linear(0, 1, 1, 0); // Giảm dần
+    public bool IsDashing;
 
     [Header("Movement & Rotation")]
     public float rotationSpeed = 15f;
@@ -26,10 +29,15 @@ public class PlayerStateMachine : MonoBehaviour
     public Transform model;       // Mesh nhân vật để xoay
     public Transform mainCamera;
 
+   
+
     [HideInInspector] public float gravity;
     [HideInInspector] public float initialJumpVelocity;
     public CharacterController CharController { get; private set; }
     public PlayerBaseState CurrentState { get; set; }
+    public bool IsAttacking { get; private set; }
+
+
     private PlayerStateFactory _states;
     public Vector3 Velocity;
     public Vector2 InputVector;
@@ -37,6 +45,29 @@ public class PlayerStateMachine : MonoBehaviour
     public float JumpBufferCounter;
     public Animator animator;
 
+    // Khai báo trong vùng Variables của PlayerController
+    public readonly int IDVertical = Animator.StringToHash("Vertical");
+    public readonly int IDHorizontal = Animator.StringToHash("Horizontal");
+    public readonly int IDSpeed = Animator.StringToHash("Speed");
+    public readonly int IDJump = Animator.StringToHash("Jump");
+    public readonly int IDFall = Animator.StringToHash("Fall");
+    public readonly int IDDash = Animator.StringToHash("Dash");
+    // DI CHUYỂN 8 HƯỚNG
+    public readonly int Anim_Idle = Animator.StringToHash("HumanM@Idle01");
+    public readonly int Anim_Run_F = Animator.StringToHash("HumanM@Run01_Forward");
+    public readonly int Anim_Run_B = Animator.StringToHash("HumanM@Run01_Backward");
+    public readonly int Anim_Run_L = Animator.StringToHash("HumanM@Run01_Left");
+    public readonly int Anim_Run_R = Animator.StringToHash("HumanM@Run01_Right");
+    public readonly int Anim_Run_FL = Animator.StringToHash("HumanM@Run01_ForwardLeft");
+    public readonly int Anim_Run_FR = Animator.StringToHash("HumanM@Run01_ForwardRight");
+    public readonly int Anim_Run_BL = Animator.StringToHash("HumanM@Run01_BackwardLeft");
+    public readonly int Anim_Run_BR = Animator.StringToHash("HumanM@Run01_BackwardRight");
+
+    // CÁC ANIMATION CẦN THIẾT KHÁC
+    public readonly int Anim_Jump_Begin = Animator.StringToHash("HumanM@Jump01 - Begin");
+    public readonly int Anim_Falling = Animator.StringToHash("HumanM@Fall01");
+    public readonly int Anim_Land = Animator.StringToHash("HumanM@Jump01 - Land");
+    public readonly int Anim_Dash = Animator.StringToHash("HumanM@Dash01"); // Thường là sprint hoặc dash
     void Awake()
     {
         CharController = GetComponent<CharacterController>();
@@ -61,17 +92,66 @@ public class PlayerStateMachine : MonoBehaviour
 
         HandleTimers();
         HandleRotation(); // Logic xoay model 360 độ
-
+        IsAttacking = Input.GetMouseButton(0);
         CurrentState.UpdateStates();
         ApplyPhysics();
 
         if (_dashCooldownTimer > 0) _dashCooldownTimer -= Time.deltaTime;
     }
 
+    public int GetMovementAnimation()
+    {
+        // 1. Nếu không bấm phím nào thì đứng yên
+        if (InputVector.sqrMagnitude < 0.01f) return Anim_Idle;
+
+        float x = InputVector.x;
+        float y = InputVector.y;
+
+        // 2. KHI TẤN CÔNG (Combat Mode / Strafe Mode)
+        if (IsAttacking)
+        {
+            // Nhóm DI CHUYỂN LÙI (y < 0)
+            if (y < -0.1f)
+            {
+                if (x < -0.1f) return Anim_Run_BL; // Lùi - Trái
+                if (x > 0.1f) return Anim_Run_BR;  // Lùi - Phải
+                return Anim_Run_B;                 // Lùi thẳng
+            }
+
+            // Nhóm DI CHUYỂN TIẾN (y > 0)
+            if (y > 0.1f)
+            {
+                if (x < -0.1f) return Anim_Run_FL; // Tiến - Trái
+                if (x > 0.1f) return Anim_Run_FR;  // Tiến - Phải
+                return Anim_Run_F;                 // Tiến thẳng
+            }
+
+            // Nhóm DI CHUYỂN NGANG THUẦN TÚY (y gần bằng 0)
+            if (x < -0.1f) return Anim_Run_L;      // Ngang - Trái
+            if (x > 0.1f) return Anim_Run_R;       // Ngang - Phải
+        }
+
+        // 3. BÌNH THƯỜNG (Free Movement)
+        // Model tự xoay theo hướng phím nên luôn dùng Run_Forward
+        return Anim_Run_F;
+    }
     private void HandleRotation()
     {
-        // Xoay model theo hướng di chuyển phím bấm + Camera
-        if (InputVector.sqrMagnitude > 0.01f && !(CurrentState is PlayerDashState))
+        if (CurrentState is PlayerDashState) return;
+
+        // Nếu ĐANG TẤN CÔNG: Luôn nhìn về hướng Camera
+        if (IsAttacking)
+        {
+            Vector3 cameraForward = mainCamera.forward;
+            cameraForward.y = 0;
+            if (cameraForward != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(cameraForward);
+                model.rotation = Quaternion.Slerp(model.rotation, targetRotation, rotationSpeed * 2f * Time.deltaTime);
+            }
+        }
+        // Nếu KHÔNG TẤN CÔNG: Chỉ nhìn theo hướng phím bấm
+        else if (InputVector.sqrMagnitude > 0.01f)
         {
             Vector3 moveDir = GetLookDirection();
             if (moveDir != Vector3.zero)
@@ -81,7 +161,6 @@ public class PlayerStateMachine : MonoBehaviour
             }
         }
     }
-
     public Vector3 GetLookDirection()
     {
         Vector3 f = mainCamera.forward;
@@ -100,6 +179,25 @@ public class PlayerStateMachine : MonoBehaviour
         return moveDir;
     }
 
+    private int _lastPlayedHash;
+  
+
+    public void PlayAnimation(int animHash, float transition = 0.1f)
+    {
+        if (animator != null && _lastPlayedHash != animHash)
+        {
+            _lastPlayedHash = animHash;
+            animator.CrossFadeInFixedTime(animHash, transition);
+        }
+    }
+    // Nếu bạn vẫn muốn dùng string để debug nhanh
+    public void PlayAnimation(string animName, float transition = 0.1f)
+    {
+        if (animator != null)
+        {
+            animator.CrossFadeInFixedTime(animName, transition);
+        }
+    }
     private void ApplyPhysics()
     {
         if (CurrentState is PlayerDashState) return;
@@ -122,10 +220,7 @@ public class PlayerStateMachine : MonoBehaviour
         CoyoteCounter = CharController.isGrounded ? 0.15f : CoyoteCounter - Time.deltaTime;
     }
 
-    public void PlayAnimation(string animName, float transition = 0.1f)
-    {
-        if (animator != null) animator.CrossFadeInFixedTime(animName, transition);
-    }
+    
 
     public bool CanDash() => _dashCooldownTimer <= 0;
     public void ResetDashCooldown() => _dashCooldownTimer = dashCooldown;
