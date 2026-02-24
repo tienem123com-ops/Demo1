@@ -7,24 +7,25 @@ public class PlayerJumpingState : PlayerBaseState
 
     public override void EnterState()
     {
-        _ctx.PlayAnimation(_ctx.Anim_Jump_Begin, 0.05f); // Transition rất ngắn để bật lên ngay
-        _ctx.Velocity.y = _ctx.initialJumpVelocity;
+        _ctx.PlayAnimation(_ctx.Anim_Jump_Begin, 0.05f);
+        ApplyJumpVelocity();
     }
 
-    private void HandleJump()
+    private void ApplyJumpVelocity()
     {
-        // Tính toán lực nhảy dựa trên công thức vật lý mượt mà
-        // Velocity.y = sqrt(jumpHeight * -2 * gravity)
-        _ctx.Velocity.y = _ctx.initialJumpVelocity;
+        _ctx.SetVelocity(
+            _ctx.Velocity.x,
+            _ctx.initialJumpVelocity,
+            _ctx.Velocity.z
+        );
 
-        // Reset Jump Buffer để tránh nhảy liên hồi
-        _ctx.JumpBufferCounter = 0;
-        _ctx.CoyoteCounter = 0;
+        _ctx.JumpBufferCounter = 0f;
+        _ctx.CoyoteCounter = 0f;
     }
 
     protected override void UpdateState()
     {
-        // Vừa nhảy xong là chuyển sang Falling ngay để Falling quản lý momentum
+        // Immediately transition to falling after applying jump velocity
         CheckSwitchState();
     }
 
@@ -32,7 +33,6 @@ public class PlayerJumpingState : PlayerBaseState
 
     public override void CheckSwitchState()
     {
-        // Luôn chuyển sang Falling sau khi đã áp dụng lực nhảy ban đầu
         SwitchState(_factory.Falling());
     }
 

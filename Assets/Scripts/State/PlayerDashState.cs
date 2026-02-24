@@ -2,46 +2,55 @@
 
 public class PlayerDashState : PlayerBaseState
 {
+    private const float MOMENTUM_RETENTION = 0.5f;
+
     private float _timer;
     private Vector3 _dashVelocity;
 
     public PlayerDashState(PlayerStateMachine ctx, PlayerStateFactory factory)
-     : base(ctx, factory) { IsRootState = true; }
+        : base(ctx, factory) { IsRootState = true; }
 
     public override void EnterState()
     {
         _ctx.IsDashing = true;
         _ctx.PlayAnimation(_ctx.Anim_Dash, 0.05f);
+        _ctx.ResetDashCooldown();
 
-        // Hướng Dash chuẩn
-        Vector3 dashDir = _ctx.GetLookDirection();
-        if (dashDir == Vector3.zero) dashDir = _ctx.model.forward;
+        ComputeDashVelocity();
+        _timer = 0f;
+    }
 
-        float speed = _ctx.dashLength / _ctx.dashDuration;
+    private void ComputeDashVelocity()
+    {
+        Vector3 dashDir = _ctx.GetHorizontalDashDirection();
+        float speed = _ctx.dashLength / Mathf.Max(0.0001f, _ctx.dashDuration);
         _dashVelocity = dashDir * speed;
-        _timer = 0;
+
+        // Apply initial dash velocity
+        _ctx.SetVelocity(_dashVelocity.x, 0f, _dashVelocity.z);
     }
 
     protected override void UpdateState()
     {
         _timer += Time.deltaTime;
 
-        _ctx.Velocity.x = _dashVelocity.x;
-        _ctx.Velocity.z = _dashVelocity.z;
-        _ctx.Velocity.y = 0; // Khóa trọng lực
+        // Maintain dash velocity and lock Y
+        _ctx.SetVelocity(_dashVelocity.x, 0f, _dashVelocity.z);
 
         if (_timer >= _ctx.dashDuration)
-        {
             CheckSwitchState();
-        }
     }
 
     protected override void ExitState()
     {
         _ctx.IsDashing = false;
-        // Celeste-style: Giữ lại một phần lực sau khi Dash để di chuyển tiếp mượt mà
-        _ctx.Velocity.x *= 0.5f;
-        _ctx.Velocity.z *= 0.5f;
+
+        // Celeste-style momentum retention
+        _ctx.SetVelocity(
+            _ctx.Velocity.x * MOMENTUM_RETENTION,
+            _ctx.Velocity.y,
+            _ctx.Velocity.z * MOMENTUM_RETENTION
+        );
     }
 
     public override void CheckSwitchState()

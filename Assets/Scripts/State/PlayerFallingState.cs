@@ -1,24 +1,47 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Falling state: handles air movement with responsive curves.
+/// Implements momentum preservation + responsive acceleration.
+/// </summary>
 public class PlayerFallingState : PlayerBaseState
 {
+    private const float INPUT_THRESHOLD = 0.01f;
+
+    private IMovementHandler _movementHandler;
+    private ResponsiveDecelerationHandler _decelerationHandler;
+
     public PlayerFallingState(PlayerStateMachine ctx, PlayerStateFactory factory)
-        : base(ctx, factory) { IsRootState = true; }
+        : base(ctx, factory) 
+    { 
+        IsRootState = true;
+        _movementHandler = ctx.AirMovementHandler;
+    }
 
     public override void EnterState()
     {
-        // Nếu chuyển từ Jump sang Falling, dùng transition mượt để thấy tư thế rơi
         _ctx.PlayAnimation(_ctx.Anim_Falling, 0.15f);
     }
+
     protected override void UpdateState()
     {
         Vector3 moveDir = _ctx.GetLookDirection();
-        Vector3 targetMove = moveDir * _ctx.runMaxSpeed;
-
-        // MOMENTUM: Sử dụng Lerp để vận tốc ngang thay đổi từ từ
-        // Nếu vận tốc hiện tại đang nhanh hơn runMaxSpeed (do lướt rồi nhảy), nó sẽ giảm dần về maxSpeed
-        _ctx.Velocity.x = Mathf.Lerp(_ctx.Velocity.x, targetMove.x, _ctx.airControl * Time.deltaTime);
-        _ctx.Velocity.z = Mathf.Lerp(_ctx.Velocity.z, targetMove.z, _ctx.airControl * Time.deltaTime);
+        
+        // Better Movement: Apply responsive air control
+        Vector3 velocity = _ctx.Velocity;
+        
+        if (moveDir.sqrMagnitude > INPUT_THRESHOLD)
+        {
+            _movementHandler.ApplyAirControl(moveDir, ref velocity);
+        }
+        else
+        {
+            // Decelerate smoothly if no input
+            // Note: Initialize deceleration handler here if needed
+            // For now, maintain current velocity in air
+        }
+        
+        _ctx.Velocity = velocity;
 
         CheckSwitchState();
     }
@@ -26,7 +49,16 @@ public class PlayerFallingState : PlayerBaseState
     public override void CheckSwitchState()
     {
         if (_ctx.CharController.isGrounded)
+        {
             SwitchState(_factory.Grounded());
+            return;
+        }
+
+        if (_ctx.JumpBufferCounter > 0f && _ctx.CoyoteCounter > 0f)
+        {
+            SwitchState(_factory.Jumping());
+            return;
+        }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && _ctx.CanDash())
             SwitchState(_factory.Dash());

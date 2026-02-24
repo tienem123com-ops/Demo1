@@ -1,17 +1,31 @@
-﻿public class PlayerIdleState : PlayerBaseState
+﻿using UnityEngine;
+
+public class PlayerIdleState : PlayerBaseState
 {
-    public PlayerIdleState(PlayerStateMachine ctx, PlayerStateFactory factory) : base(ctx, factory) { }
+    private const float INPUT_THRESHOLD = 0.01f;
+
+    public PlayerIdleState(PlayerStateMachine ctx, PlayerStateFactory factory)
+        : base(ctx, factory) { }
 
     public override void EnterState()
     {
-        // Gọi thông qua Hash đã khai báo ở Controller
         _ctx.PlayAnimation(_ctx.Anim_Idle, 0.1f);
     }
-    protected override void UpdateState() { _ctx.Velocity.x = 0; _ctx.Velocity.z = 0; CheckSwitchState(); }
+
+    protected override void UpdateState()
+    {
+        // Stop horizontal movement
+        _ctx.SetVelocity(_ctx.Velocity.x * 0f, _ctx.Velocity.y, _ctx.Velocity.z * 0f);
+        CheckSwitchState();
+    }
+
     protected override void ExitState() { }
+
     public override void CheckSwitchState()
     {
-        if (_ctx.InputVector.magnitude > 0.01f) SwitchState(_factory.Run());
+        if (_ctx.InputVector.magnitude > INPUT_THRESHOLD)
+            SwitchState(_factory.Run());
     }
-    public override void InitializeSubState() { }
+
+    public override void InitializeSubState() { }       
 }

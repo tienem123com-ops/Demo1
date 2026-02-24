@@ -52,4 +52,4 @@ public abstract class PlayerBaseState
     {
         _parentState = _newParentState;
     }
-}
+}      

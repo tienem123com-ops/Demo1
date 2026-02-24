@@ -3,28 +3,33 @@
 public class CameraLook : MonoBehaviour
 {
     [Header("Camera Control")]
-    public Transform cameraTarget; // Cái Empty Object ngang vai Player
-    public float sensitivity = 2f;
-    private float xRotation;
-    private float yRotation;
+    [SerializeField] private Transform _cameraTarget;
+    [SerializeField] private float _sensitivity = 2f;
 
-    void Start()
+    private float _xRotation;
+    private float _yRotation;
+
+    private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Khóa chuột để tránh lệch tâm
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
-    // Trong PlayerController.cs hoặc script điều khiển xoay
-    void LateUpdate()
+    private void LateUpdate()
     {
-        // Tính toán góc xoay dựa trên Mouse Input
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
-        yRotation += mouseX;
-        xRotation += mouseY;
-        // Xoay Target để Camera bám theo
-        cameraTarget.rotation = Quaternion.Euler(-xRotation, yRotation, 0);
+        UpdateRotation();
+    }
 
-        // Ép người Player xoay theo hướng ngang
-        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+    private void UpdateRotation()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * _sensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * _sensitivity;
+
+        _yRotation += mouseX;
+        _xRotation += mouseY;
+
+        if (_cameraTarget != null)
+            _cameraTarget.rotation = Quaternion.Euler(-_xRotation, _yRotation, 0);
+
+        transform.rotation = Quaternion.Euler(0, _yRotation, 0);
     }
 }

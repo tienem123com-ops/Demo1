@@ -1,44 +1,64 @@
 ﻿using UnityEngine;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
+/// <summary>
+/// Run state: player is moving horizontally with responsive curves.
+/// Implements "Building Better Movement" pattern with normalized curve functions.
+/// </summary>
 public class PlayerRunState : PlayerBaseState
 {
-    private int _lastAnimHash;
+    private const float BACKWARD_SPEED_MODIFIER = 0.65f;
+    private const float IDLE_SPEED_MODIFIER = 0.8f;
+    private const float INPUT_THRESHOLD = 0.01f;
+    private const float STRAFE_INPUT_THRESHOLD = 0.1f;
 
-    public PlayerRunState(PlayerStateMachine ctx, PlayerStateFactory factory) : base(ctx, factory) { }
+    private IMovementHandler _movementHandler;
+
+    public PlayerRunState(PlayerStateMachine ctx, PlayerStateFactory factory)
+        : base(ctx, factory) 
+    {
+        _movementHandler = ctx.GroundMovementHandler;
+    }
 
     public override void EnterState()
     {
-        // Đừng gọi string "Run", hãy gọi hàm xác định 8 hướng của bạn
         int moveAnim = _ctx.GetMovementAnimation();
         _ctx.PlayAnimation(moveAnim, 0.1f);
     }
-    private int _currentAnimHash; // Lưu hash đang chơi để tránh gọi lại liên tục
 
     protected override void UpdateState()
     {
         Vector3 moveDir = _ctx.GetLookDirection();
-        float targetSpeed = _ctx.runMaxSpeed;
+        float targetSpeed = CalculateTargetSpeed();
 
-        // Tính toán modifier nếu đang tấn công
-        if (_ctx.IsAttacking)
-        {
-            if (_ctx.InputVector.y < -0.1f) targetSpeed *= 0.65f;
-            else if (Mathf.Abs(_ctx.InputVector.y) < 0.1f) targetSpeed *= 0.8f;
-        }
+        // Better Movement: Use responsive curve (not linear acceleration)
+        Vector3 velocity = _ctx.Velocity;
+        _movementHandler.ApplyMovement(moveDir, targetSpeed, ref velocity);
+        _ctx.Velocity = velocity;
 
-        // Gán vận tốc di chuyển ngang
-        _ctx.Velocity.x = moveDir.x * targetSpeed;
-        _ctx.Velocity.z = moveDir.z * targetSpeed;
-
-        // Cập nhật Animation
         _ctx.PlayAnimation(_ctx.GetMovementAnimation());
 
         CheckSwitchState();
     }
+
+    private float CalculateTargetSpeed()
+    {
+        float speed = _ctx.runMaxSpeed;
+
+        if (_ctx.IsAttacking)
+        {
+            if (_ctx.InputVector.y < -STRAFE_INPUT_THRESHOLD)
+                speed *= BACKWARD_SPEED_MODIFIER;
+            else if (Mathf.Abs(_ctx.InputVector.y) < STRAFE_INPUT_THRESHOLD)
+                speed *= IDLE_SPEED_MODIFIER;
+        }
+
+        return speed;
+    }
+
     public override void CheckSwitchState()
     {
-        if (_ctx.InputVector.magnitude < 0.01f) SwitchState(_factory.Idle());
+        if (_ctx.InputVector.magnitude < INPUT_THRESHOLD)
+            SwitchState(_factory.Idle());
     }
 
     protected override void ExitState() { }
