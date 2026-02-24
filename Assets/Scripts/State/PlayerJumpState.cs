@@ -1,9 +1,14 @@
-﻿using UnityEngine;
-
+﻿
+using UnityEngine;
 public class PlayerJumpingState : PlayerBaseState
 {
+    private const float JUMP_RELEASE_MULTIPLIER = 0.5f;
+
     public PlayerJumpingState(PlayerStateMachine ctx, PlayerStateFactory factory)
-        : base(ctx, factory) { IsRootState = true; }
+        : base(ctx, factory)
+    {
+        IsRootState = true;
+    }
 
     public override void EnterState()
     {
@@ -25,7 +30,8 @@ public class PlayerJumpingState : PlayerBaseState
 
     protected override void UpdateState()
     {
-        // Immediately transition to falling after applying jump velocity
+        HandleVariableJump();
+        HandleAirMovement();
         CheckSwitchState();
     }
 
@@ -33,8 +39,34 @@ public class PlayerJumpingState : PlayerBaseState
 
     public override void CheckSwitchState()
     {
-        SwitchState(_factory.Falling());
+        if (_ctx.Velocity.y <= 0f)
+        {
+            SwitchState(_factory.Falling());
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && _ctx.CanDash())
+        {
+            SwitchState(_factory.Dash());
+        }
     }
 
     public override void InitializeSubState() { }
+
+    private void HandleVariableJump()
+    {
+        if (!Input.GetButton("Jump") && _ctx.Velocity.y > 0f)
+        {
+            _ctx.SetVelocityY(_ctx.Velocity.y * JUMP_RELEASE_MULTIPLIER);
+        }
+    }
+
+    private void HandleAirMovement()
+    {
+        Vector3 moveDirection = _ctx.GetLookDirection();
+        Vector3 currentVelocity = _ctx.Velocity;
+        _ctx.AirMovementHandler.ApplyAirControl(moveDirection, ref currentVelocity);
+        _ctx.Velocity = currentVelocity;
+    }
 }
+

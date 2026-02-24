@@ -4043,6 +4043,7 @@ MonoBehaviour:
   _friction: 30
   _gravityScaling: 1
   _fallClamp: -30
+  _lowJumpMultiplier: 2
   _coyoteTime: 0.3
   _jumpBufferTime: 0.1
   _dashForce: 35
@@ -4080,8 +4081,10 @@ MonoBehaviour:
   _animator: {fileID: 0}
   _maxSlopeAngle: 45
   _slopeCheckDistance: 0.5
-  _gravity: 0
-  _initialJumpVelocity: 0
+  _tAttack: 0.1
+  _tRelease: 0.15
+  _gravity: -49.999996
+  _initialJumpVelocity: 19.999998
 --- !u!1 &1870563764
 GameObject:
   m_ObjectHideFlags: 0
