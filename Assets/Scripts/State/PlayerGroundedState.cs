@@ -26,6 +26,13 @@ public class PlayerGroundedState : PlayerBaseState
 
     public override void CheckSwitchState()
     {
+        // Lệnh này cực kỳ quan trọng để cho phép Dash dưới đất
+        if (Input.GetKeyDown(KeyCode.LeftShift) && _ctx.CanDash())
+        {
+            SwitchState(_factory.Dash());
+            return;
+        }
+
         if (_ctx.JumpBufferCounter > 0 && _ctx.CoyoteCounter > 0) SwitchState(_factory.Jumping());
         else if (!_ctx.CharController.isGrounded) SwitchState(_factory.Falling());
     }

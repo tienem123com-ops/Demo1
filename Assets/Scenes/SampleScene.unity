@@ -2438,11 +2438,11 @@ MonoBehaviour:
   runMaxSpeed: 12
   runAcceleration: 90
   friction: 30
-  gravityScaling: 2.5
+  gravityScaling: 1
   fallClamp: -30
   dashForce: 35
   dashCooldown: 1
-  dashLength: 0
+  dashLength: 11
   dashDuration: 0.2
   dashCurve:
     serializedVersion: 2

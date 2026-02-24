@@ -18,28 +18,21 @@ public class PlayerRunState : PlayerBaseState
     protected override void UpdateState()
     {
         Vector3 moveDir = _ctx.GetLookDirection();
+        float targetSpeed = _ctx.runMaxSpeed;
 
-        // Tính toán Speed Multiplier dựa trên hướng di chuyển khi đang ATK
-        float speedMultiplier = 1.0f;
+        // Tính toán modifier nếu đang tấn công
         if (_ctx.IsAttacking)
         {
-            if (_ctx.InputVector.y < -0.1f) speedMultiplier = 0.65f; // Lùi chậm nhất
-            else if (Mathf.Abs(_ctx.InputVector.y) < 0.1f) speedMultiplier = 0.8f; // Đi ngang vừa
+            if (_ctx.InputVector.y < -0.1f) targetSpeed *= 0.65f;
+            else if (Mathf.Abs(_ctx.InputVector.y) < 0.1f) targetSpeed *= 0.8f;
         }
 
-        float targetSpeed = _ctx.runMaxSpeed * speedMultiplier;
+        // Gán vận tốc di chuyển ngang
+        _ctx.Velocity.x = moveDir.x * targetSpeed;
+        _ctx.Velocity.z = moveDir.z * targetSpeed;
 
-        // Áp dụng vận tốc mượt mà
-        _ctx.Velocity.x = Mathf.Lerp(_ctx.Velocity.x, moveDir.x * targetSpeed, _ctx.runAcceleration * Time.deltaTime);
-        _ctx.Velocity.z = Mathf.Lerp(_ctx.Velocity.z, moveDir.z * targetSpeed, _ctx.runAcceleration * Time.deltaTime);
-
-        // Xử lý chuyển đổi Animation (Tránh dính frame bằng biến _currentAnimHash như đã làm)
-        int targetAnim = _ctx.GetMovementAnimation();
-        if (targetAnim != _currentAnimHash)
-        {
-            _currentAnimHash = targetAnim;
-            _ctx.PlayAnimation(targetAnim, 0.15f);
-        }
+        // Cập nhật Animation
+        _ctx.PlayAnimation(_ctx.GetMovementAnimation());
 
         CheckSwitchState();
     }

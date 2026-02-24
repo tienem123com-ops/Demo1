@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using StatMaster; // Đảm bảo đã cài đặt package
 [RequireComponent(typeof(CharacterController))]
 public class PlayerStateMachine : MonoBehaviour
 {
@@ -88,17 +88,45 @@ public class PlayerStateMachine : MonoBehaviour
 
     void Update()
     {
+        // 1. Cập nhật Input và Timers
         InputVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
         HandleTimers();
-        HandleRotation(); // Logic xoay model 360 độ
+        HandleRotation();
         IsAttacking = Input.GetMouseButton(0);
-        CurrentState.UpdateStates();
-        ApplyPhysics();
 
+        // 2. Chạy logic của State (Run/Idle/Dash sẽ cập nhật biến Velocity)
+        CurrentState.UpdateStates();
+
+        // 3. THỰC THI VẬT LÝ TẬP TRUNG (Dòng duy nhất gọi Move)
+        HandleUnifiedPhysics();
+    }
+
+    private void HandleUnifiedPhysics()
+    {
+        // Nếu không Dash, áp dụng trọng lực
+        if (!IsDashing)
+        {
+            if (CharController.isGrounded && Velocity.y < 0)
+            {
+                Velocity.y = -2f;
+            }
+            else
+            {
+                float multiplier = (Velocity.y < 0) ? gravityScaling : 1f;
+                Velocity.y += gravity * multiplier * Time.deltaTime;
+                Velocity.y = Mathf.Max(Velocity.y, fallClamp);
+            }
+        }
+        // Nếu đang Dash, Velocity.y đã được PlayerDashState gán bằng 0
+
+        // Thực thi di chuyển thực tế
+        CharController.Move(Velocity * Time.deltaTime);
+
+        // Quản lý Dash Cooldown
         if (_dashCooldownTimer > 0) _dashCooldownTimer -= Time.deltaTime;
     }
 
+    // XÓA BỎ HOÀN TOÀN HÀM ApplyPhysics() CŨ ĐỂ TRÁNH XUNG ĐỘT
     public int GetMovementAnimation()
     {
         // 1. Nếu không bấm phím nào thì đứng yên
@@ -217,7 +245,7 @@ public class PlayerStateMachine : MonoBehaviour
     {
         if (Input.GetButtonDown("Jump")) JumpBufferCounter = 0.2f;
         else JumpBufferCounter -= Time.deltaTime;
-        CoyoteCounter = CharController.isGrounded ? 0.15f : CoyoteCounter - Time.deltaTime;
+        CoyoteCounter = CharController.isGrounded ?1f : CoyoteCounter - Time.deltaTime;
     }
 
     
