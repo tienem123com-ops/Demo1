@@ -7,7 +7,7 @@ public class PlayerJumpingState : PlayerBaseState
     public PlayerJumpingState(PlayerStateMachine ctx, PlayerStateFactory factory)
         : base(ctx, factory)
     {
-        IsRootState = true;
+        _isRootState = true;
     }
 
     public override void EnterState()

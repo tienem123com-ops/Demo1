@@ -14,7 +14,7 @@ public class PlayerFallingState : PlayerBaseState
     public PlayerFallingState(PlayerStateMachine ctx, PlayerStateFactory factory)
         : base(ctx, factory) 
     { 
-        IsRootState = true;
+        _isRootState = true;
         _movementHandler = ctx.AirMovementHandler;
     }
 

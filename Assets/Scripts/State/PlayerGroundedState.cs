@@ -5,7 +5,7 @@ public class PlayerGroundedState : PlayerBaseState
     private const float LANDING_VELOCITY_THRESHOLD = -5.0f;
 
     public PlayerGroundedState(PlayerStateMachine ctx, PlayerStateFactory factory)
-        : base(ctx, factory) { IsRootState = true; }
+        : base(ctx, factory) { _isRootState = true; }
 
     public override void EnterState()
     {

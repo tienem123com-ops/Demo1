@@ -8,7 +8,7 @@ public class PlayerDashState : PlayerBaseState
     private Vector3 _dashVelocity;
 
     public PlayerDashState(PlayerStateMachine ctx, PlayerStateFactory factory)
-        : base(ctx, factory) { IsRootState = true; }
+        : base(ctx, factory) { _isRootState = true; }
 
     public override void EnterState()
     {

@@ -1,18 +1,25 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Base class for hierarchical player states.
+/// Ensures full sub-state cleanup when switching states.
+/// </summary>
 public abstract class PlayerBaseState
 {
-    protected PlayerBaseState(PlayerStateMachine _currentContext, PlayerStateFactory factory)
+    protected PlayerBaseState(PlayerStateMachine currentContext, PlayerStateFactory factory)
     {
-        _ctx = _currentContext;
+        _ctx = currentContext;
         _factory = factory;
     }
 
-    protected bool IsRootState = false;
     protected readonly PlayerStateMachine _ctx;
     protected readonly PlayerStateFactory _factory;
-    protected PlayerBaseState _childState { get; private set; }
-    protected PlayerBaseState _parentState { get; private set; }
+
+    protected bool _isRootState = false;
+
+    protected PlayerBaseState _childState;
+    protected PlayerBaseState _parentState;
+
     public PlayerBaseState ChildState => _childState;
 
     public virtual void EnterState() { }
@@ -27,12 +34,17 @@ public abstract class PlayerBaseState
         _childState?.UpdateStates();
     }
 
-    public void SwitchState(PlayerBaseState newState)
+    /// <summary>
+    /// Switches state and guarantees full cleanup of child hierarchy.
+    /// </summary>
+    protected void SwitchState(PlayerBaseState newState)
     {
-        ExitState();
-        newState.EnterState();
+        // 🔥 Clear entire sub-state tree before exiting
+        ClearSubStateRecursive();
 
-        if (IsRootState)
+        ExitState();
+
+        if (_isRootState)
         {
             _ctx.CurrentState = newState;
         }
@@ -40,16 +52,32 @@ public abstract class PlayerBaseState
         {
             _parentState?.SetChildState(newState);
         }
+
+        newState.EnterState();
     }
 
-    protected void SetChildState(PlayerBaseState _newChildState)
+    /// <summary>
+    /// Recursively clears child states to prevent lingering updates.
+    /// </summary>
+    private void ClearSubStateRecursive()
     {
-        _childState = _newChildState;
+        if (_childState == null)
+            return;
+
+        _childState.ClearSubStateRecursive();
+        _childState.ExitState();
+        _childState = null;
+    }
+
+    protected void SetChildState(PlayerBaseState newChildState)
+    {
+        _childState = newChildState;
         _childState.SetParentState(this);
+        _childState.EnterState();
     }
 
-    protected void SetParentState(PlayerBaseState _newParentState)
+    protected void SetParentState(PlayerBaseState newParentState)
     {
-        _parentState = _newParentState;
+        _parentState = newParentState;
     }
-}      
+}
