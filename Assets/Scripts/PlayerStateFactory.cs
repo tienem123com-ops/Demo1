@@ -1,7 +1,7 @@
 ﻿public class PlayerStateFactory
 {
-    PlayerStateMachine _context;
-    public PlayerStateFactory(PlayerStateMachine currentContext) => _context = currentContext;
+    PlayerController _context;
+    public PlayerStateFactory(PlayerController currentContext) => _context = currentContext;
 
     public PlayerBaseState Grounded() => new PlayerGroundedState(_context, this);
     public PlayerBaseState Jumping() => new PlayerJumpingState(_context, this);

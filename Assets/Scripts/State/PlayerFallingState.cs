@@ -11,7 +11,7 @@ public class PlayerFallingState : PlayerBaseState
     private IMovementHandler _movementHandler;
     private ResponsiveDecelerationHandler _decelerationHandler;
 
-    public PlayerFallingState(PlayerStateMachine ctx, PlayerStateFactory factory)
+    public PlayerFallingState(PlayerController ctx, PlayerStateFactory factory)
         : base(ctx, factory) 
     { 
         _isRootState = true;

@@ -4,7 +4,7 @@ public class PlayerIdleState : PlayerBaseState
 {
     private const float INPUT_THRESHOLD = 0.01f;
 
-    public PlayerIdleState(PlayerStateMachine ctx, PlayerStateFactory factory)
+    public PlayerIdleState(PlayerController ctx, PlayerStateFactory factory)
         : base(ctx, factory) { }
 
     public override void EnterState()

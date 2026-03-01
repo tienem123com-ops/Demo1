@@ -7,7 +7,7 @@ public class PlayerDashState : PlayerBaseState
     private float _timer;
     private Vector3 _dashVelocity;
 
-    public PlayerDashState(PlayerStateMachine ctx, PlayerStateFactory factory)
+    public PlayerDashState(PlayerController ctx, PlayerStateFactory factory)
         : base(ctx, factory) { _isRootState = true; }
 
     public override void EnterState()

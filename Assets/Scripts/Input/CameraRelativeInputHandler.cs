@@ -31,7 +31,8 @@ public class CameraRelativeInputHandler : IInputHandler
         forward.y = 0f;
         right.y = 0f;
         forward.Normalize();
-        right.Normalize();
+
+        right.Normalize ();
 
         return (forward * input.y + right * input.x).normalized;
     }

@@ -4,7 +4,7 @@ public class PlayerJumpingState : PlayerBaseState
 {
     private const float JUMP_RELEASE_MULTIPLIER = 0.5f;
 
-    public PlayerJumpingState(PlayerStateMachine ctx, PlayerStateFactory factory)
+    public PlayerJumpingState(PlayerController ctx, PlayerStateFactory factory)
         : base(ctx, factory)
     {
         _isRootState = true;

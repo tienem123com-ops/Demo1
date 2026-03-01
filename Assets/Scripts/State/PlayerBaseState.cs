@@ -6,13 +6,13 @@
 /// </summary>
 public abstract class PlayerBaseState
 {
-    protected PlayerBaseState(PlayerStateMachine currentContext, PlayerStateFactory factory)
+    protected PlayerBaseState(PlayerController currentContext, PlayerStateFactory factory)
     {
         _ctx = currentContext;
         _factory = factory;
     }
 
-    protected readonly PlayerStateMachine _ctx;
+    protected readonly PlayerController _ctx;
     protected readonly PlayerStateFactory _factory;
 
     protected bool _isRootState = false;

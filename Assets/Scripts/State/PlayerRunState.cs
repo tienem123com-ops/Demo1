@@ -13,7 +13,7 @@ public class PlayerRunState : PlayerBaseState
 
     private IMovementHandler _movementHandler;
 
-    public PlayerRunState(PlayerStateMachine ctx, PlayerStateFactory factory)
+    public PlayerRunState(PlayerController ctx, PlayerStateFactory factory)
         : base(ctx, factory) 
     {
         _movementHandler = ctx.GroundMovementHandler;

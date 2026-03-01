@@ -2,7 +2,7 @@
 
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerStateMachine : MonoBehaviour
+public class PlayerController : Damageable
 {
     // Config
     [Header("GDC 2016 Constants")]
@@ -134,6 +134,7 @@ public class PlayerStateMachine : MonoBehaviour
     public readonly int Anim_Land = Animator.StringToHash("HumanM@Jump01 - Land");
     public readonly int Anim_Dash = Animator.StringToHash("HumanM@Dash01");
 
+    public SO_PlayerConfiguration PlayerConfig { get; private set; }
     private void Awake()
     {
         _charController = GetComponent<CharacterController>();
