@@ -9,4 +9,6 @@
     public PlayerBaseState Idle() => new PlayerIdleState(_context, this);
     public PlayerBaseState Dash() => new PlayerDashState(_context, this);
     public PlayerBaseState Run() => new PlayerRunState(_context, this);
+    public PlayerAttackState Attack() => new PlayerAttackState(_context, this);
 }
+

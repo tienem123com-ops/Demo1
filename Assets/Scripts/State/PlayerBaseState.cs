@@ -37,7 +37,7 @@ public abstract class PlayerBaseState
     /// <summary>
     /// Switches state and guarantees full cleanup of child hierarchy.
     /// </summary>
-    protected void SwitchState(PlayerBaseState newState)
+    public void SwitchState(PlayerBaseState newState)
     {
         // 🔥 Clear entire sub-state tree before exiting
         ClearSubStateRecursive();

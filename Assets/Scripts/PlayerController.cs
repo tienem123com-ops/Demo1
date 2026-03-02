@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Events;
 
 
 [RequireComponent(typeof(CharacterController))]
@@ -133,7 +135,11 @@ public class PlayerController : Damageable
     public readonly int Anim_Falling = Animator.StringToHash("HumanM@Fall01");
     public readonly int Anim_Land = Animator.StringToHash("HumanM@Jump01 - Land");
     public readonly int Anim_Dash = Animator.StringToHash("HumanM@Dash01");
+    [Header("Combat")]
+    [SerializeField] public SO_ComboChain _comboChain;
 
+    private PlayerAttackState _attackState;
+    private bool _attackLocked;
     public SO_PlayerConfiguration PlayerConfig { get; private set; }
     private void Awake()
     {
@@ -142,7 +148,7 @@ public class PlayerController : Damageable
             _mainCamera = Camera.main != null ? Camera.main.transform : null;
         if (_animator == null)
             _animator = GetComponentInChildren<Animator>();
-
+        _attackState = new PlayerAttackState(this, _states);
         ComputePhysicsConstants();
         InitializeServices();
         _states = new PlayerStateFactory(this);
@@ -177,7 +183,10 @@ public class PlayerController : Damageable
 
         UpdateTimers();
         HandleRotationAndPhysics();
-
+        if (!_attackLocked && _inputHandler.IsAttacking)
+        {
+            SwitchState(_attackState);
+        }
         _currentState.UpdateStates();
         ApplyMovement();
 
@@ -198,10 +207,11 @@ public class PlayerController : Damageable
 
     private void ApplyMovement()
     {
+        
         _physicsHandler.ApplyGravity(ref _velocity, _isDashing);
         if (_charController.isGrounded)
             _physicsHandler.ApplyGroundSnap(ref _velocity);
-
+        if (!_attackLocked)
         _charController.Move(_velocity * Time.deltaTime);
         DetectGroundNormal();
 
@@ -260,6 +270,27 @@ public class PlayerController : Damageable
         Vector3 moveDir = GetLookDirection();
         return moveDir.sqrMagnitude < 0.01f ? (_model?.forward ?? Vector3.forward) : moveDir;
     }
+    public void SwitchState(PlayerBaseState newState)
+    {
+        _currentState.SwitchState(newState);
+        
+    }
+
+    public void SetAttackLock(bool value)
+    {
+        _attackLocked = value;
+    }
+private void OnAnimatorMove()
+{
+    if (_attackLocked && _animator.applyRootMotion)
+    {
+        Vector3 delta = _animator.deltaPosition;
+        _charController.Move(delta);
+    }
+}
+    public bool IsAttackLocked => _attackLocked;
+
+    public Action OnAttackEnd;
 
     public bool CanDash() => _dashCooldownTimer <= 0f;
     public void ResetDashCooldown() => _dashCooldownTimer = _dashCooldown;
@@ -269,5 +300,16 @@ public class PlayerController : Damageable
     public void SetVelocityY(float y) => _velocity.y = y;
     public void SetVelocityZ(float z) => _velocity.z = z;
     public void AddVelocity(Vector3 delta) => _velocity += delta;
+    [SerializeField] private GameObject _weaponHitbox;
+
+public void EnableHitbox()
+{
+    _weaponHitbox.SetActive(true);
+}
+
+public void DisableHitbox()
+{
+    _weaponHitbox.SetActive(false);
+}
 }
 
