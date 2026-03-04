@@ -23,7 +23,7 @@ public class PlayerDashState : PlayerBaseState
     private void ComputeDashVelocity()
     {
         Vector3 dashDir = _ctx.GetHorizontalDashDirection();
-        float speed = _ctx.dashLength / Mathf.Max(0.0001f, _ctx.dashDuration);
+        float speed = _ctx.DashLength / Mathf.Max(0.0001f, _ctx.DashDuration);
         _dashVelocity = dashDir * speed;
 
         // Apply initial dash velocity
@@ -37,7 +37,7 @@ public class PlayerDashState : PlayerBaseState
         // Maintain dash velocity and lock Y
         _ctx.SetVelocity(_dashVelocity.x, 0f, _dashVelocity.z);
 
-        if (_timer >= _ctx.dashDuration)
+        if (_timer >= _ctx.DashDuration)
             CheckSwitchState();
     }
 

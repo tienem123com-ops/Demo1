@@ -42,7 +42,7 @@ public class PlayerRunState : PlayerBaseState
 
     private float CalculateTargetSpeed()
     {
-        float speed = _ctx.runMaxSpeed;
+        float speed = _ctx.RunMaxSpeed;
 
         if (_ctx.IsAttacking)
         {

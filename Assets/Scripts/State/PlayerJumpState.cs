@@ -20,7 +20,7 @@ public class PlayerJumpingState : PlayerBaseState
     {
         _ctx.SetVelocity(
             _ctx.Velocity.x,
-            _ctx.initialJumpVelocity,
+            _ctx.InitialJumpVelocity,
             _ctx.Velocity.z
         );
 

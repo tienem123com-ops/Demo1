@@ -17,12 +17,7 @@ public class PlayerGroundedState : PlayerBaseState
 
     protected override void UpdateState()
     {
-        if (_ctx.InputHandler.IsAttacking)
-        {
-            SwitchState(_factory.Attack());
-            return;
-        }
-
+      
         CheckSwitchState();
     }
     protected override void ExitState() { }
