@@ -1206,7 +1206,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.81, y: 3.464, z: -3.67}
+  m_LocalPosition: {x: -30.81, y: 3.414, z: -3.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2342,7 +2342,7 @@ Transform:
   m_GameObject: {fileID: 644571248}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.81, y: 3.464, z: -3.67}
+  m_LocalPosition: {x: -30.81, y: 3.414, z: -3.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2360,8 +2360,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 625c14eee3ad46c99df7c7c891ef668a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonFollow
-  Damping: {x: 0.1, y: 0.5, z: 0.3}
-  ShoulderOffset: {x: 0, y: 0.05, z: -1.88}
+  Damping: {x: 0.1, y: 0.98, z: 0.3}
+  ShoulderOffset: {x: 0, y: 0, z: -1.88}
   VerticalArmLength: 0.4
   CameraSide: 1
   CameraDistance: 2
@@ -4251,7 +4251,7 @@ MonoBehaviour:
   <RunMaxSpeed>k__BackingField: 12
   <RunAcceleration>k__BackingField: 90
   <Friction>k__BackingField: 30
-  <GravityScaling>k__BackingField: 2.5
+  <GravityScaling>k__BackingField: 1
   <FallClamp>k__BackingField: -30
   <CoyoteTime>k__BackingField: 0.15
   <JumpBufferTime>k__BackingField: 0.1
@@ -4292,7 +4292,8 @@ MonoBehaviour:
   <SlopeCheckDistance>k__BackingField: 0.5
   <TAttack>k__BackingField: 0.1
   <TRelease>k__BackingField: 0.15
-  _weaponHitbox: {fileID: 0}
+  _weaponHitbox: {fileID: 863421311}
+  _normalAttackCombo: {fileID: 11400000, guid: e9717781b0cfd7c4f917acced7c2ee65, type: 2}
 --- !u!1 &1854081719
 GameObject:
   m_ObjectHideFlags: 0

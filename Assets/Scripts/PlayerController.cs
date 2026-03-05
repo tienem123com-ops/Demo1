@@ -145,10 +145,14 @@ public class PlayerController : Damageable
     public readonly int Anim_Land = Animator.StringToHash("HumanM@Jump01 - Land");
     public readonly int Anim_Dash = Animator.StringToHash("HumanM@Dash01");
 
-    // ================= CORE =================
-
+    // ================= COMBAT =================
+    [Header("Combat")]
+     public ComboSequence _normalAttackCombo;
     private void Awake()
     {
+
+
+ 
         _charController = GetComponent<CharacterController>();
 
         if (MainCamera == null && Camera.main != null)
@@ -160,6 +164,8 @@ public class PlayerController : Damageable
         ComputePhysicsConstants();
         InitializeServices();
         _states = new PlayerStateFactory(this);
+        
+       
     }
 
 
@@ -317,7 +323,7 @@ public class PlayerController : Damageable
     public void SetVelocityZ(float z) => _velocity.z = z;
     public void AddVelocity(Vector3 delta) => _velocity += delta;
 
-
+  
 
 }
 

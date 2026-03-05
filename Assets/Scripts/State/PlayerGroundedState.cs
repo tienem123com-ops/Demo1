@@ -17,7 +17,7 @@ public class PlayerGroundedState : PlayerBaseState
 
     protected override void UpdateState()
     {
-      
+
         CheckSwitchState();
     }
     protected override void ExitState() { }
@@ -49,5 +49,12 @@ public class PlayerGroundedState : PlayerBaseState
         // Leave ground
         if (!_ctx.CharController.isGrounded)
             SwitchState(_factory.Falling());
+        // Thêm điều kiện chuyển sang Attack
+        if (Input.GetMouseButtonDown(0))
+        {
+            SwitchState(_factory.Attack());
+            return;
+        }
+
     }
 }
