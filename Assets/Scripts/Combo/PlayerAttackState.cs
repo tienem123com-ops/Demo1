@@ -7,7 +7,8 @@ public class PlayerAttackState : PlayerBaseState
     
     private bool _comboQueued = false;
     private bool _hasDealtDamage = false;
-
+private float _bufferTimer = 0f;
+    private const float BUFFER_WINDOW = 0.2f; // Cho phép bấm trước 0.2s
     public PlayerAttackState(PlayerController ctx, PlayerStateFactory factory)
         : base(ctx, factory)
     {
@@ -25,7 +26,8 @@ public class PlayerAttackState : PlayerBaseState
     {
         _comboQueued = false;
         _hasDealtDamage = false;
-        
+        _ctx.SetAttackLock(true);
+        _ctx.SetRotationLock(true);
         var data = _normalAttackCombo.attacks[_currentIndex];
         _ctx.PlayAnimation(data.animationName, 0.05f);
         
@@ -35,9 +37,15 @@ public class PlayerAttackState : PlayerBaseState
 
     protected override void UpdateState()
     {
-        var data = _normalAttackCombo.attacks[_currentIndex];
+       var data = _normalAttackCombo.attacks[_currentIndex];
         var stateInfo = _ctx.Animator.GetCurrentAnimatorStateInfo(0);
         float nTime = stateInfo.normalizedTime % 1f;
+
+        // Cập nhật Buffer Timer
+        if (_bufferTimer > 0) _bufferTimer -= Time.deltaTime;
+
+        // Xử lý Input Buffering: Nếu bấm nút, reset timer
+        if (Input.GetMouseButtonDown(0)) _bufferTimer = BUFFER_WINDOW;
 
         // Quét qua các Windows trong AttackData hiện tại
         foreach (var window in data.windows)
@@ -64,15 +72,16 @@ public class PlayerAttackState : PlayerBaseState
             }
         }
 
-        // Kiểm tra chuyển đòn hoặc thoát state
-        if (nTime >= 0.9f) // Gần cuối animation
+       // Kiểm tra chuyển đòn (Dùng Buffer thay vì _comboQueued trực tiếp)
+        if (nTime >= 0.7f) // Có thể bắt đầu buffer từ 70% animation
         {
-            if (_comboQueued && _currentIndex < _normalAttackCombo.attacks.Count - 1)
+            if (_bufferTimer > 0 && _currentIndex < _normalAttackCombo.attacks.Count - 1)
             {
                 _currentIndex++;
+                _bufferTimer = 0; // Reset sau khi đã dùng
                 StartAttackStep();
             }
-            else if (nTime >= 0.98f) // Hết hẳn anim mà không có combo tiếp
+            else if (nTime >= 0.98f)
             {
                 CheckSwitchState();
             }
@@ -85,5 +94,11 @@ public class PlayerAttackState : PlayerBaseState
             SwitchState(_factory.Grounded());
         else
             SwitchState(_factory.Falling());
+       
+    }
+    override protected void ExitState()
+    {
+        _ctx.SetAttackLock(false);
+        _ctx.SetRotationLock(false);
     }
 }

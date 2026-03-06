@@ -25,6 +25,7 @@ public class PlayerIdleState : PlayerBaseState
     {
         if (_ctx.InputVector.magnitude > INPUT_THRESHOLD)
             SwitchState(_factory.Run());
+      
     }
 
     public override void InitializeSubState() { }       

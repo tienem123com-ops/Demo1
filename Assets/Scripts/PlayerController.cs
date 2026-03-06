@@ -148,6 +148,8 @@ public class PlayerController : Damageable
     // ================= COMBAT =================
     [Header("Combat")]
      public ComboSequence _normalAttackCombo;
+    private bool _rotationLocked;
+
     private void Awake()
     {
 
@@ -209,7 +211,7 @@ public class PlayerController : Damageable
         _isAttacking = _inputHandler.IsAttacking;
 
         UpdateTimers();
-        HandleRotationAndPhysics();
+        HandleRotation();
 
         _currentState.UpdateStates();
         ApplyMovement();
@@ -217,9 +219,9 @@ public class PlayerController : Damageable
         _wasGroundedLastFrame = _charController.isGrounded;
     }
 
-    private void HandleRotationAndPhysics()
+    private void HandleRotation()
     {
-        if (_currentState is PlayerDashState) return;
+        if (_currentState is PlayerDashState || _rotationLocked) return;
 
         Vector3 moveDir = GetLookDirection();
 
@@ -231,7 +233,6 @@ public class PlayerController : Damageable
 
     private void ApplyMovement()
     {
-
         _physicsHandler.ApplyGravity(ref _velocity, _isDashing);
         if (_charController.isGrounded)
             _physicsHandler.ApplyGroundSnap(ref _velocity);
@@ -304,6 +305,10 @@ public class PlayerController : Damageable
     {
         _attackLocked = value;
     }
+     public void SetRotationLock(bool v)
+    {
+        _rotationLocked = v;
+    }
     private void OnAnimatorMove()
     {
         if (_attackLocked && Animator.applyRootMotion)
@@ -323,7 +328,6 @@ public class PlayerController : Damageable
     public void SetVelocityZ(float z) => _velocity.z = z;
     public void AddVelocity(Vector3 delta) => _velocity += delta;
 
-  
-
+   
 }
 

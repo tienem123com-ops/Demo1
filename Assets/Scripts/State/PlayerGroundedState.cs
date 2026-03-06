@@ -11,8 +11,8 @@ public class PlayerGroundedState : PlayerBaseState
     {
         if (_ctx.Velocity.y < LANDING_VELOCITY_THRESHOLD)
             _ctx.PlayAnimation(_ctx.Anim_Land, 0.1f);
-
         InitializeSubState();
+     
     }
 
     protected override void UpdateState()
@@ -24,10 +24,7 @@ public class PlayerGroundedState : PlayerBaseState
 
     public override void InitializeSubState()
     {
-        if (_ctx.InputVector.magnitude < 0.01f)
-            SetChildState(_factory.Idle());
-        else
-            SetChildState(_factory.Run());
+          SetChildState(_factory.Idle());
     }
 
     public override void CheckSwitchState()
