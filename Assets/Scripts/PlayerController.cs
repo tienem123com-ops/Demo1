@@ -47,7 +47,7 @@ public class PlayerController : Damageable
     [field: SerializeField] public float TAttack { get; private set; } = 0.1f;
     [field: SerializeField] public float TRelease { get; private set; } = 0.15f;
 
-    [SerializeField] private GameObject _weaponHitbox;
+    public GameObject _weaponHitbox;
 
     // ================= SERVICES =================
 
@@ -84,6 +84,7 @@ public class PlayerController : Damageable
     private bool _attackLocked;
 
     // ================= PROPERTIES =================
+    public PlayerInputs _playerInputs;
 
     public CharacterController CharController => _charController;
     public PlayerBaseState CurrentState { get => _currentState; set => _currentState = value; }
@@ -149,6 +150,8 @@ public class PlayerController : Damageable
     [Header("Combat")]
      public ComboSequence _normalAttackCombo;
     private bool _rotationLocked;
+    private int _skillCD_Temp;
+    private int _burstCD_Temp;
 
     private void Awake()
     {
@@ -271,7 +274,7 @@ public class PlayerController : Damageable
 
     private void UpdateTimers()
     {
-        _jumpBufferCounter = Input.GetButtonDown("Jump")
+        _jumpBufferCounter = _playerInputs.Jump
             ? JumpBufferTime
             : Mathf.Max(0f, _jumpBufferCounter - Time.deltaTime);
 
@@ -318,8 +321,11 @@ public class PlayerController : Damageable
         }
     }
 
-
-    public bool CanDash() => _dashCooldownTimer <= 0f;
+    public bool IsNormalAttack => _playerInputs.LeftMouse;
+    public bool IsElementalSkill => _playerInputs.E && _skillCD_Temp <= 0;
+    public bool IsElementalBurst => _playerInputs.Q && _burstCD_Temp <= 0;
+    public bool CanDash() => _playerInputs.Dash && _dashCooldownTimer <= 0f;
+    public bool CanAttack() =>  !_isAttacking && !_attackLocked;
     public void ResetDashCooldown() => _dashCooldownTimer = DashCooldown;
 
     public void SetVelocity(float x, float y, float z) => _velocity = new Vector3(x, y, z);
@@ -328,6 +334,10 @@ public class PlayerController : Damageable
     public void SetVelocityZ(float z) => _velocity.z = z;
     public void AddVelocity(Vector3 delta) => _velocity += delta;
 
-   
+    public  void DetectionNA(GameObject _gameObject)
+    {
+        Debug.Log($"Player caused NA DMG to {_gameObject.name}");
+    }
+
 }
 

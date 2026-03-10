@@ -58,6 +58,7 @@ private float _bufferTimer = 0f;
                     if (!_hasDealtDamage) {
                         Debug.Log($"Gây sát thương đòn {_currentIndex}");
                         _hasDealtDamage = true;
+                        _ctx._weaponHitbox.SetActive(true);
                     }
                     break;
 
@@ -98,6 +99,7 @@ private float _bufferTimer = 0f;
     }
     override protected void ExitState()
     {
+         _ctx._weaponHitbox.SetActive(false);
         _ctx.SetAttackLock(false);
         _ctx.SetRotationLock(false);
     }

@@ -8,7 +8,7 @@ public class TriggerDetection : DetectionBase
     private void OnTriggerEnter(Collider other)
     {
         if(!layerToCheck.Contains(other.gameObject)) return;
-        
+        Debug.Log($"Trigger Enter: {other.gameObject.name}");
         CollisionEnterEvent?.Invoke(other.gameObject);
         PositionEnterEvent?.Invoke(other.ClosestPointOnBounds(transform.position));
     }
@@ -21,3 +21,4 @@ public class TriggerDetection : DetectionBase
         PositionExitEvent?.Invoke(other.ClosestPointOnBounds(transform.position));
     }
 }
+

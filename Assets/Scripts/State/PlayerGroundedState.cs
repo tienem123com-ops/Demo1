@@ -30,7 +30,7 @@ public class PlayerGroundedState : PlayerBaseState
     public override void CheckSwitchState()
     {
         // Dash dưới đất
-        if (Input.GetKeyDown(KeyCode.LeftShift) && _ctx.CanDash())
+        if ( _ctx.CanDash())
         {
             SwitchState(_factory.Dash());
             return;
@@ -47,7 +47,7 @@ public class PlayerGroundedState : PlayerBaseState
         if (!_ctx.CharController.isGrounded)
             SwitchState(_factory.Falling());
         // Thêm điều kiện chuyển sang Attack
-        if (Input.GetMouseButtonDown(0))
+        if (_ctx.IsNormalAttack)
         {
             SwitchState(_factory.Attack());
             return;

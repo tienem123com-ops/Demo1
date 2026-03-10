@@ -15,8 +15,11 @@ MonoBehaviour:
   animationName: Thrust Slash
   windows:
   - actionName: Hitbox
-    startTime: 0.2
-    endTime: 0
+    startTime: 0.327
+    endTime: 1
   - actionName: ComboInput
+    startTime: 0.23
+    endTime: 1
+  - actionName: DashCancel
     startTime: 0.23
     endTime: 1

@@ -1,18 +1,19 @@
 using System;
 using NaughtyAttributes;
+using ParadoxNotion;
 using UnityEngine;
 
 public class PhysicsDetection : DetectionBase, IPooled<PhysicsDetection>
 {
     [Tooltip("Bán kính kiểm tra va chạm"), Range(0.1f, 20f)]
     public float radiusCheck;
-    
+
     [Tooltip("Layer cần kiểm tra va chạm")]
     public LayerMask layerToCheck;
 
     [SerializeField] private bool drawGizmos;
-    [SerializeField, ShowIf("drawGizmos")] private Color drawColor;
-    
+    [SerializeField] private Color color ;
+
     private readonly Collider[] hitColliders = new Collider[10];
 
     public void CheckCollision()
@@ -24,14 +25,15 @@ public class PhysicsDetection : DetectionBase, IPooled<PhysicsDetection>
             PositionEnterEvent?.Invoke(hitColliders[i].ClosestPointOnBounds(transform.position));
         }
     }
-    
+
     public void Release() => ReleaseCallback?.Invoke(this);
     public Action<PhysicsDetection> ReleaseCallback { get; set; }
-    
-    public void OnDrawGizmos()
+
+    void OnDrawGizmos()
     {
-        if(!drawGizmos) return;
-        Gizmos.color = drawColor;
+        if (!drawGizmos) return;
+        Gizmos.color = color.WithAlpha(1f);
         Gizmos.DrawWireSphere(transform.position, radiusCheck);
+     
     }
 }
