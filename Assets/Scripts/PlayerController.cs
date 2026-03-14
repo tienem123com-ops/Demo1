@@ -47,6 +47,7 @@ public class PlayerController : Damageable
     [field: SerializeField] public float TAttack { get; private set; } = 0.1f;
     [field: SerializeField] public float TRelease { get; private set; } = 0.15f;
 
+    public  float offsetLunge = 1f;
     public GameObject _weaponHitbox;
 
     // ================= SERVICES =================
@@ -104,8 +105,7 @@ public class PlayerController : Damageable
         set => _jumpBufferCounter = Mathf.Max(0f, value);
     }
 
-    public bool IsDashing { get => _isDashing; set => _isDashing = value; }
-    public bool IsAttacking => _isAttacking;
+    
 
     public float Gravity => _gravity;
     public float InitialJumpVelocity => _initialJumpVelocity;
@@ -165,7 +165,7 @@ public class PlayerController : Damageable
 
         if (Animator == null)
             Animator = GetComponentInChildren<Animator>();
-
+        
         ComputePhysicsConstants();
         InitializeServices();
         _states = new PlayerStateFactory(this);
@@ -293,11 +293,26 @@ public class PlayerController : Damageable
     public void PlayAnimation(string animName, float transition = 0.1f)
         => _animationHandler.PlayAnimation(animName, transition);
 
-    public Vector3 GetHorizontalDashDirection()
-    {
-        Vector3 moveDir = GetLookDirection();
-        return moveDir.sqrMagnitude < 0.01f ? (Model?.forward ?? Vector3.forward) : moveDir;
-    }
+   public Vector3 GetHorizontalDashDirection()
+{
+    Vector2 input = _inputVector;
+
+    if (input.sqrMagnitude < 0.01f)
+        return Model ? Model.forward : Vector3.forward;
+
+    Vector3 camForward = MainCamera.forward;
+    Vector3 camRight = MainCamera.right;
+
+    camForward.y = 0f;
+    camRight.y = 0f;
+
+    camForward.Normalize();
+    camRight.Normalize();
+
+    Vector3 moveDir = camForward * input.y + camRight * input.x;
+
+    return moveDir.normalized;
+}
     public void SwitchState(PlayerBaseState newState)
     {
         _currentState.SwitchState(newState);
@@ -324,8 +339,10 @@ public class PlayerController : Damageable
     public bool IsNormalAttack => _playerInputs.LeftMouse;
     public bool IsElementalSkill => _playerInputs.E && _skillCD_Temp <= 0;
     public bool IsElementalBurst => _playerInputs.Q && _burstCD_Temp <= 0;
-    public bool CanDash() => _playerInputs.Dash && _dashCooldownTimer <= 0f;
-    public bool CanAttack() =>  !_isAttacking && !_attackLocked;
+    public bool CanDash=> _playerInputs.Dash && _dashCooldownTimer <= 0f;
+    
+    public bool CanJump=> _playerInputs.Jump ;
+    public bool CanAttack =>  !_isAttacking && !_attackLocked;
     public void ResetDashCooldown() => _dashCooldownTimer = DashCooldown;
 
     public void SetVelocity(float x, float y, float z) => _velocity = new Vector3(x, y, z);
@@ -334,10 +351,83 @@ public class PlayerController : Damageable
     public void SetVelocityZ(float z) => _velocity.z = z;
     public void AddVelocity(Vector3 delta) => _velocity += delta;
 
-    public  void DetectionNA(GameObject _gameObject)
+    [SerializeField]PhysicsDetection Na_Detection;
+    [SerializeField]PhysicsDetection Lunge_Detection;
+    public void DetectionNA(GameObject _gameObject)
     {
-        Debug.Log($"Player caused NA DMG to {_gameObject.name}");
+        CauseDMG(_gameObject,AttackType.NormalAttack);
+   
     }
+      public  void CheckNADetection()
+    {
+        Na_Detection.CheckCollision();
+        Lunge_Detection.CheckCollision();
+    }
+    public override void CauseDMG(GameObject _gameObject, AttackType _attackType)
+    {
+         Debug.Log(_gameObject.name + " is being attacked with " + _attackType);
+       if (!DamageableData.Contains(_gameObject, out var receiver)) return;
 
+      
+
+        receiver.TakeDMG(333, true);
+    }
+  #region Combat Lunge
+
+[SerializeField] private float _comboLungeDuration = 0.18f;
+[SerializeField] private AnimationCurve _lungeCurve =
+    AnimationCurve.EaseInOut(0,0,1,1);
+
+private Coroutine _lungeRoutine;
+
+public void LungeTo(Vector3 targetPosition)
+{
+    if (_lungeRoutine != null)
+        StopCoroutine(_lungeRoutine);
+
+    _lungeRoutine = StartCoroutine(LungeRoutine(targetPosition));
 }
+
+private System.Collections.IEnumerator LungeRoutine(Vector3 target)
+{
+    Vector3 start = transform.position;
+
+    Vector3 dir = target - start;
+    dir.y = 0f;
+
+    float dist = Mathf.Min(dir.magnitude, Lunge_Detection.radiusCheck);
+
+    if (dist <0.1f)
+        yield break;
+
+    dir.Normalize();
+
+    float timer = 0f;
+    Vector3 lastPos = start;
+
+    while (timer < _comboLungeDuration)
+    {
+        timer += Time.deltaTime;
+
+        float t = timer / _comboLungeDuration;
+        float curve = _lungeCurve.Evaluate(t);
+
+        Vector3 targetPos = start + dir * dist * curve;
+
+        Vector3 delta = targetPos - lastPos-dir.normalized*offsetLunge;
+
+        _charController.Move(delta);
+
+        if (Model != null)
+            Model.rotation = Quaternion.LookRotation(dir);
+
+        lastPos = targetPos;
+
+        yield return null;
+    }
+}
+
+#endregion
+}
+
 

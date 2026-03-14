@@ -60,7 +60,7 @@ public class PlayerFallingState : PlayerBaseState
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && _ctx.CanDash())
+        if ( _ctx.CanDash)
             SwitchState(_factory.Dash());
     }
 

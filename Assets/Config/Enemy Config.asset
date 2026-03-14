@@ -20,7 +20,7 @@ MonoBehaviour:
   ChargedAttackMultiplier: []
   SkillMultiplier: []
   SpecialMultiplier: []
-  MaxHP: 1000
+  MaxHP: 22222222
   ATK: 0
   CRITRate: 5
   CRITDMG: 50

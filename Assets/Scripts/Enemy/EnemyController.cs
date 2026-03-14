@@ -101,9 +101,9 @@ public class EnemyController : Damageable, IPooled<EnemyController>
 
     private void ApplyScalingFromPlayer()
     {
-        ScaleStat(_player.PlayerConfig.GetHP(), RuntimeConfig.GetHPRatio(),value=> RuntimeConfig.SetHP(value));
-        ScaleStat(_player.PlayerConfig.GetDEF(), RuntimeConfig.GetDEFRatio(), value => RuntimeConfig.SetDEF(value));
-        ScaleStat(_player.PlayerConfig.GetLevel(), RuntimeConfig.GetLevelRatio(), value => RuntimeConfig.SetLevel(value));
+       // ScaleStat(_player.PlayerConfig.GetHP(), RuntimeConfig.GetHPRatio(),value=> RuntimeConfig.SetHP(value));
+       // ScaleStat(_player.PlayerConfig.GetDEF(), RuntimeConfig.GetDEFRatio(), value => RuntimeConfig.SetDEF(value));
+       // ScaleStat(_player.PlayerConfig.GetLevel(), RuntimeConfig.GetLevelRatio(), value => RuntimeConfig.SetLevel(value));
     }
 
     private void ScaleStat(int playerValue, float ratio, Action<int> setter)

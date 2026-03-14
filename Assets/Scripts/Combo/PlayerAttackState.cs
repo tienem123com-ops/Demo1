@@ -28,6 +28,7 @@ private float _bufferTimer = 0f;
         _hasDealtDamage = false;
         _ctx.SetAttackLock(true);
         _ctx.SetRotationLock(true);
+ 
         var data = _normalAttackCombo.attacks[_currentIndex];
         _ctx.PlayAnimation(data.animationName, 0.05f);
         
@@ -58,18 +59,31 @@ private float _bufferTimer = 0f;
                     if (!_hasDealtDamage) {
                         Debug.Log($"Gây sát thương đòn {_currentIndex}");
                         _hasDealtDamage = true;
-                        _ctx._weaponHitbox.SetActive(true);
+                     
+                        
                     }
                     break;
 
                 case "ComboInput":
                     // Nếu bấm chuột trong lúc này, đánh dấu là sẽ đánh đòn tiếp theo
-                    if (Input.GetMouseButtonDown(0)) _comboQueued = true;
+                    if (_ctx.CanAttack) _comboQueued = true;
                     break;
 
                 case "DashCancel":
-                    if (Input.GetKeyDown(KeyCode.LeftShift)) SwitchState(_factory.Dash());
+                    if (_ctx.CanDash) SwitchState(_factory.Dash());
                     break;
+                case "Lunge":
+                         _ctx.CheckNADetection();
+                         break;
+                case "JumpCancel":
+                    if (_ctx.JumpBufferCounter > 0)
+                    {
+                        SwitchState(_factory.Jumping());
+                        return;
+                    }
+                    break;
+
+
             }
         }
 

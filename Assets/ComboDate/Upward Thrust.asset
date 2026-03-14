@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eeaf8e8a267f6b648b0a8f4873b6ad46, type: 3}
-  m_Name: Thrust
+  m_Name: Upward Thrust
   m_EditorClassIdentifier: Assembly-CSharp::AttackData
-  animationName: Thrust Slash
+  animationName: Upward Thrust
   windows:
   - actionName: Hitbox
-    startTime: 0.327
+    startTime: 0.739
     endTime: 1
   - actionName: ComboInput
     startTime: 0.23
@@ -23,3 +23,6 @@ MonoBehaviour:
   - actionName: DashCancel
     startTime: 0.23
     endTime: 1
+  - actionName: Lunge
+    startTime: 0
+    endTime: 0.078

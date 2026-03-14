@@ -30,7 +30,7 @@ public class PlayerGroundedState : PlayerBaseState
     public override void CheckSwitchState()
     {
         // Dash dưới đất
-        if ( _ctx.CanDash())
+        if ( _ctx.CanDash)
         {
             SwitchState(_factory.Dash());
             return;

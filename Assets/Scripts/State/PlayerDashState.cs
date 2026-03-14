@@ -12,7 +12,7 @@ public class PlayerDashState : PlayerBaseState
 
     public override void EnterState()
     {
-        _ctx.IsDashing = true;
+
         _ctx.PlayAnimation(_ctx.Anim_Dash, 0.05f);
         _ctx.ResetDashCooldown();
 
@@ -39,11 +39,17 @@ public class PlayerDashState : PlayerBaseState
 
         if (_timer >= _ctx.DashDuration)
             CheckSwitchState();
+        if (_ctx.Model != null)
+        {
+            Vector3 dashDir = _ctx.GetHorizontalDashDirection();
+            _ctx.Model.rotation = Quaternion.LookRotation(dashDir);
+        }
+
     }
 
     protected override void ExitState()
     {
-        _ctx.IsDashing = false;
+
 
         // Celeste-style momentum retention
         _ctx.SetVelocity(
